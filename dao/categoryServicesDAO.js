@@ -26,8 +26,9 @@ module.exports = {
                     rej(err);
                 else if (result.rowCount === 0)
                     rej({status:'Error', message: 'Error to get categories'});
-
+                
                 res(result.rows);
+                
             })
         })
     },
