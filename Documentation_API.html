@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Documentation</title>
+
+		<style type="text/css">
+			div{
+				border: 1px solid blue;
+				padding: 20px;
+			}
+
+			table, td{
+				border: 1px solid black;
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1> Rotas disponíveis: </h1>
+
+
+
+	<h2> Routes to user </h2>
+
+	<div>	
+		/user/register <br/>
+
+		<p>
+			Objetivo: Rota para realizar o cadastro de novos usuários.
+		</p>
+		<p>
+			Requisição: POST
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>email</td>
+					<td>email(String)</td>
+				</tr>
+				<tr> 
+					<td>name</td>
+					<td>String</td>
+				</tr>
+				<tr> 
+					<td>indicator</td>
+					<td>String</td>
+				</tr>
+				<tr> 
+					<td>password</td>
+					<td>String</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+	<div>	
+		/user/updateName <br/>
+
+		<p>
+			Objetivo: Rota para atualizar nome de usuário.
+		</p>
+		<p>
+			Requisição: PUT
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>idUser</td>
+					<td>Integer</td>
+				</tr>
+				<tr> 
+					<td>name</td>
+					<td>String</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+	<div>	
+		/user/affiliate/:linkID <br/>
+
+		<p>
+			Objetivo: Rota para pegar quantia de afiliados de um usuário específico.
+		</p>
+		<p>
+			Requisição: GET	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>linkID</td>
+					<td>String</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div>	
+		/user/:id <br/>
+
+		<p>
+			Objetivo: Rota para pegar as informações básicas de um usuário específico.
+		</p>
+		<p>
+			Requisição: GET	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>id</td>
+					<td>String</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2> Routes to wallet  </h2>
+
+	<div>	
+		/user/wallet/:id' <br/>
+		<p>
+			Objetivo: Rota para pegar o saldo da carteira de um usuário específico.
+		</p>
+		<p>
+			Requisição: GET	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>id</td>
+					<td>String</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div>	
+		/user/wallet <br/>
+		<p>
+			Objetivo: Rota para atualizar o saldo da carteira de um usuário específico.
+		</p>
+		<p>
+			Requisição: PUT	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>id</td>
+					<td>String</td>
+				</tr>
+				<tr>
+					<td>value</td>
+					<td>Double</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+	<h2> Routes to categories  </h2>
+
+	<div>	
+		/categoryProduct <br/>
+		<p>
+			Objetivo: Rota para criar uma nova categoria de produtos.
+		</p>
+		<p>
+			Requisição: POST	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>name</td>
+					<td>String</td>
+				</tr>
+				<tr>
+					<td>description</td>
+					<td>String</td>
+				</tr>
+				<tr>
+					<td>idUser</td>
+					<td>String</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div>	
+		/categoryProduct  <br/>
+
+		<p>
+			Objetivo: Rota para pegar as categoria de produtos existentes no banco de dados.
+		</p>
+		<p>
+			Requisição: GET	
+		</p>
+
+		** Não há parametros até então.
+	</div>
+
+	<h2> Routes to product  </h2>
+
+	<div>	
+		/product <br/>
+
+		<p>
+			Objetivo: Rota para criar um novo produtos.
+		</p>
+		<p>
+			Requisição: POST	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>name</td>
+					<td>String</td>
+				</tr>
+				<tr>
+					<td>description</td>
+					<td>String</td>
+				</tr>
+				<tr>
+					<td>price</td>
+					<td>Double</td>
+				</tr>
+				<tr>
+					<td>category</td>
+					<td>Integer</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div>	
+		/product/:category <br/>
+
+		<p>
+			Objetivo: Rota para pegar os produtos de uma categoria especifica.
+		</p>
+		<p>
+			Requisição: GET	
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Campo</th>
+					<th>Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr> 
+					<td>category</td>
+					<td>Integer</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+	</body>
+</html>
