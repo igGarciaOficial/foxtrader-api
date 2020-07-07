@@ -10,69 +10,6 @@ const GeneralController =require('./generalController.js');
 
 class UserController extends GeneralController{
 
-	static async registerUser(objectUserData){
-
-		const email = objectUserData.email
-
-		if (!validators.isValidEmail(email))
-			return {State: 'Error', message: "Email isn't valid"}
-
-		let now = new Date();
-		let dateNow = now.getFullYear().toString() + (now.getMonth()+1).toString() +now.getDay().toString() + now.getMinutes().toString() + now.getHours().toString();
-		let creatorLink = email+' '+ dateNow;
-		const linkCreateToUser = crypto.cryptoPassword(creatorLink);
-
-		// name, email, senha, indicator
-		const data = [
-			objectUserData.name,
-			email,
-			objectUserData.password,
-			objectUserData.indicator
-		];
-
-		return USER_DAO.createUser(data, linkCreateToUser);
-	}
-
-	static readUser(idUser, token=''){
-		if (!validators.isAuthenticated(token))
-			return new Promise( (resolve, reject) => {
-				reject( [{status: 'Error', message: 'User not authenticated'}] );
-			})
-
-		return USER_DAO.getUser(idUser);
-	}
-
-	static getWallet(idUser, token){
-
-		if(!validators.isAuthenticated(token)){
-			return new Promise( (resolve, reject)=>{
-				reject( [{status: 'Error', message: 'User not authenticated' }] );
-			});
-		}
-
-		return USER_DAO.getBallanceUser(idUser);
-
-	}
-
-	static async setWallet(idUser, value, token){
-		if (!validators.isAuthenticated(token)){
-			return new Promise ( (resolve, reject)=>{
-				reject( {status: 'Error', message: 'User not authenticated' } );
-			});
-		}
-		else if (value < 0){
-			return new Promise ( (resolve, reject)=>{
-				reject( {status: 'Error', message: 'value is not valid' } );
-			});
-		}
-
-		let balanceUser = await this.getWallet(idUser, token);
-		balanceUser = balanceUser.wallet + value;
-
-		return USER_DAO.updateBallanceUser(idUser, balanceUser);
-
-	}
-
 	static async addCommission(idUser, value){
 		if (value < 0){
 			return new Promise ( (resolve, reject)=>{
@@ -80,10 +17,59 @@ class UserController extends GeneralController{
 			});
 		}
 
-		let balanceUser = await this.getWallet(idUser, token);
+		let balanceUser = await this.getWallet(idUser, {}, true);
 		balanceUser = balanceUser.wallet + value;
 
 		return USER_DAO.updateBallanceUser(idUser, balanceUser);
+	}
+
+	static async doLogin(email, password){
+		let result = await USER_DAO.authenticateUser(email, password);
+		if (result){
+			let tokenGerado = tokenModule.makeToken(email);
+			let nameQuery = await USER_DAO.getUser(email);
+			return  new Promise( (res, rej) =>{
+				res({
+					status: 'OK',
+					code: 200,
+					token: { email: email, token: tokenGerado, name: nameQuery[0].name, id:nameQuery[0].id, l:nameQuery[0].level}
+				})
+			})
+
+		}
+
+		return new Promise( (res, rej) => {
+			rej( new Error('Invalid data'))
+		})
+	}
+
+	static getIdUserByLinkIndication(link){
+		return USER_DAO.getIdUserByLinkIndication(link);
+	}
+
+	static getAffiliatorUser(idUserOrLinkId){
+		return USER_DAO.getIndicatorUser(idUserOrLinkId);
+	}
+
+	static getPersonalLink(idUser, token){
+		if(!validators.isAuthenticated(token)){
+			return new Promise((res, rej)=>{
+				rej({status:'ERROR', message:'User not authenticated'})
+			})
+		}
+		return USER_DAO.getLinkUser(idUser);
+	}
+
+	static getWallet(idUser, token, system=false){
+		
+		if( !system && !validators.isAuthenticated(token)){
+			return new Promise( (resolve, reject)=>{
+				reject( [{status: 'Error', message: 'User not authenticated' }] );
+			});
+		}
+
+		return USER_DAO.getBallanceUser(idUser);
+
 	}
 
 	static async getAllAffiliates(linkIdUser, token){
@@ -125,6 +111,73 @@ class UserController extends GeneralController{
 
 	}
 
+	static async registerUser(objectUserData){
+
+		const email = objectUserData.email
+
+		if (!validators.isValidEmail(email))
+			return {State: 'Error', message: "Email isn't valid"}
+
+		let now = new Date();
+		let dateNow = now.getFullYear().toString() + (now.getMonth()+1).toString() +now.getDay().toString() + now.getMinutes().toString() + now.getHours().toString();
+		let creatorLink = email+' '+ dateNow;
+		const linkCreateToUser = crypto.cryptoPassword(creatorLink);
+
+		// name, email, senha, indicator
+		const data = [
+			objectUserData.name,
+			email,
+			objectUserData.password,
+			objectUserData.indicator
+		];
+
+		return USER_DAO.createUser(data, linkCreateToUser);
+	}
+
+	static readUser(idUser, token=''){
+		if (!validators.isAuthenticated(token))
+			return new Promise( (resolve, reject) => {
+				reject( [{status: 'Error', message: 'User not authenticated'}] );
+			})
+
+		return USER_DAO.getUser(idUser);
+	}
+
+	static async setPassword(email, password, newPassword, token){
+
+		if(!validators.isAuthenticated(token)){
+			return this.defaultAnswerToSetMethod(undefined, 'User not authenticated');
+		}
+
+		let result = await USER_DAO.authenticateUser(email, password);
+		
+		if (result)
+			return USER_DAO.updatePassword(email, newPassword);
+		return this.defaultAnswerToSetMethod(undefined, 'Password is wrong.')
+	}
+
+	static async setWallet(idUser, value, token){
+		/*if (!validators.isAuthenticated(token)){
+			return new Promise ( (resolve, reject)=>{
+				reject( {status: 'Error', message: 'User not authenticated' } );
+			});
+		}
+		else*/ 
+		/* Comentado pois isto será uma função de sistema
+		*/
+		if (value < 0){
+			return new Promise ( (resolve, reject)=>{
+				reject( {status: 'Error', message: 'value is not valid' } );
+			});
+		}
+
+		let balanceUser = await this.getWallet(idUser, token);
+		balanceUser = balanceUser.wallet + value;
+
+		return USER_DAO.updateBallanceUser(idUser, balanceUser);
+
+	}
+
 	static updateNameUser(id, name, token){
 		if (!validators.isAuthenticated(token)){
 			return new Promise((res, rej)=>{
@@ -135,50 +188,12 @@ class UserController extends GeneralController{
 		return USER_DAO.updateUserName(id, name);
 	}
 
-	static async doLogin(email, password){
-		let result = await USER_DAO.authenticateUser(email, password);
-		if (result){
-			let tokenGerado = tokenModule.makeToken(email);
-			let nameQuery = await USER_DAO.getUser(email);
-			return  new Promise( (res, rej) =>{
-				res({
-					status: 'OK',
-					code: 200,
-					token: { email: email, token: tokenGerado, name: nameQuery[0].name, id:nameQuery[0].id}
-				})
-			})
-
-		}
-
-		return new Promise( (res, rej) => {
-			rej( new Error('Invalid data'))
-		})
-	}
-
-	static getIdUserByLinkIndication(link){
-		return USER_DAO.getIdUserByLinkIndication(link);
-	}
-
-	static getAffiliatorUser(idUserOrLinkId){
-		return USER_DAO.getIndicatorUser(idUserOrLinkId);
-	}
-
 	static withdrawMoney(idUser, money){
 		/**
 		 * 1 - checar quantia disponivel
 		 * 2 - Realizar transação
 		 * 3 - Atualizar carteira
 		 */
-	}
-
-	static getPersonalLink(idUser, token){
-		if(!validators.isAuthenticated(token)){
-			return new Promise((res, rej)=>{
-
-				rej({status:'ERROR', message:'User not authenticated'})
-			})
-		}
-		return USER_DAO.getLinkUser(idUser);
 	}
 }
 

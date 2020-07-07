@@ -19,7 +19,7 @@ module.exports = {
     },
 
     readProducts(category){
-        let sql = 'SELECT colIdProduct as id, colName as name, colDescription as description, colPrice as price FROM tblProduct where colCategory = $1;';
+        let sql = 'SELECT colIdProduct as id, colName as name, colDescription as description, colPrice as price, colCategory as category FROM tblProduct where colCategory = $1 ORDER BY colName;';
 
         return new Promise( (res, rej) => {
             pool.query(sql, [category], (err, result) => {
@@ -43,9 +43,9 @@ module.exports = {
                 if(err)
                     rej(err);
                 else if(result.rowCount == 0)
-                    rej(new Error('Error to update the product'));
+                    rej({ message:'Error to update the product', status:'ERROR'});
                     //rej({status:500, message:'Error to update the product'})
-                res(result.rows);
+                res({code: 200, status: 'OK', message:'Produto atualizado com sucesso!'});
             })
         })
     },

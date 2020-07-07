@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-app.use(cors);
+app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -10,7 +10,10 @@ app.use(express.json());
 const USER_CONTROLLER = require('./controller/userController.js');
 const CATEGORY_PRODUCT = require('./controller/categoryProductsController.js');
 const PRODUCTS_CONTROLLER = require('./controller/productController.js');
+const BUSSINESS_CONTROLLER = require('./controller/bussinessController.js');
+const SUPORT_SERVICE = require('./services/suporte.js');
 const { tratarTokenRecebido } = require('./utils/token.js');
+const { isAuthenticated } = require('./utils/validators.js');
 
 /* Routes to user */
 //OK
@@ -53,10 +56,11 @@ app.put('/user/updateName', (req, res) => {
 	/**
 	 * Atualizar nome de um usuario especifico
 	 */
+	let token = tratarTokenRecebido(req.headers);
 	let id = req.body.idUser;
 	let name = req.body.name;
 
-	USER_CONTROLLER.updateNameUser(id, name)
+	USER_CONTROLLER.updateNameUser(id, name, token)
 	.then( result => {
 		res.status(200).json(result);
 	}).catch(err => {
@@ -65,9 +69,27 @@ app.put('/user/updateName', (req, res) => {
 
 });
 
+app.put('/user/updatepassword', (req, res)=>{
+	/*
+	* Rota para atualizar senha de usuario
+	*/
+
+	let token = tratarTokenRecebido(req.headers);
+	let email = req.body.email;
+	let pass = req.body.password;
+	let newPass = req.body.newPassword;
+
+	USER_CONTROLLER.setPassword(email, pass, newPass, token)
+	.then(result => {
+		res.status(200).send(result);
+	}).catch(err => {
+		res.json(err);
+	})
+})
+
 app.get('/user/affiliate/:linkID', (req, res) => {
 	/**
-	 * Pegar quantias de afiliados do usuario
+	 * Pegar quantias de afiliados do usuario em todos os níveis;
 	 */
 	let tokenTratado = tratarTokenRecebido(req.headers);
 
@@ -107,7 +129,7 @@ app.get('/user/link/:id', (req, res)=>{
 		res.status(200).send(result);
 	}).catch(err => {
 		console.log('ERRO:', err)
-		res.status(500).send(err);
+		res.json(err);
 	})
 })
 
@@ -129,21 +151,16 @@ app.get('/user/wallet/:id', (req, res)=>{
 
 });
 
-app.put('/user/wallet', (req, res)=>{
-	/**
-	 * Atualizar carteira do usuário
-	 */
-	let id = req.body.id;
-	let value = req.body.value;
-
-	USER_CONTROLLER.setWallet(id, value).then( r =>{
-		res.status(200).json(r);
+/* ROUTES TO SHOPPING */
+app.get('/shopping/all', (req, res) => {
+	BUSSINESS_CONTROLLER.getAllShopping()
+	.then(suc => {
+		res.status(200).send(suc);
 	}).catch(err => {
 		res.json(err);
 	})
 })
 
-/* ROUTES TO SHOPPING */
 app.get('/shopping/categories', (req, res)=>{
 	/**
 	 * Pegar categorias existentes
@@ -152,7 +169,7 @@ app.get('/shopping/categories', (req, res)=>{
 	.then(result => {
 		res.status(200).send(result);
 	}).catch(err => {
-		res.status(500).send(err);
+		res.json(err);
 	})
 })
 
@@ -169,7 +186,7 @@ app.post('/shopping/category', (req, res) => {
 		res.status(200).send(result);
 	}).catch(err => {
 		console.log(err);
-		res.status(500).send(err);
+		res.json(err);
 	})
 });
 
@@ -183,7 +200,7 @@ app.put('/shopping/category', (req, res)=>{
 	.then(result => {
 		res.status(200).send(result);
 	}).catch(err => {
-		res.status(500).send(err);
+		res.json(err);
 	})
 })
 
@@ -199,7 +216,7 @@ app.get('/shopping/category/products/:id', (req, res)=>{
 		res.status(200).send(result)
 	}).catch(err => {
 		console.log(err);
-		res.status(500).send(err);
+		res.json(err);
 	})
 })
 
@@ -226,11 +243,14 @@ app.post('/shopping/product/new', (req, res) => {
 		res.status(200).send(resul);
 	}).catch(err => {
 		console.log(err);
-		res.status(500).send(err);
+		res.json(err);
 	})
 })
 
-app.put('/shopping/product/:id', (req, res) => {
+app.put('/shopping/product/', (req, res) => {
+	/*
+	* ROTA PARA ATUALIZAÇÃO DE DADOS DE UM PRODUTO
+	*/
 	let name = req.body.name;
 	let price = req.body.price;
 	let description = req.body.description;
@@ -244,8 +264,57 @@ app.put('/shopping/product/:id', (req, res) => {
 	.then(suc => {
 		res.status(200).send(suc);
 	}).catch(err => {
-		res.status(500).send(err);
+		res.json(err);
 	})
+})
+
+
+/*
+* ROUTES TO SUPORT
+*/
+
+app.post('/suport/email', (req, res) => {
+	let name = req.body.name;
+	let email = req.body.email;
+	let message = req.body.message;
+
+
+	let resultado = SUPORT_SERVICE.contactSuporteByEmail(name, email, message)
+	/*.then(result=>{
+		res.status(200).json(result);
+	}).catch(err => {
+		res.json(err);
+	})*/
+	res.send(resultado);
+
+})
+
+/*
+ * Route to test token;
+*/
+
+app.post('/checkToken', (req, res) => {
+	let token = tratarTokenRecebido(req.headers);
+
+	if( isAuthenticated(token) )
+		res.status(200).json({ status:'OK' })
+	res.status(200).json({ status: 'ERROR' })
+})
+
+/*
+ * Routes to business
+*/
+
+app.get('/business/telemetry', (req, res)=> {
+	let token = tratarTokenRecebido(req.headers);
+	
+	BUSSINESS_CONTROLLER.getTelemetry(token)
+	.then(result => {
+		res.status(200).json(result);
+	}).catch(err => {
+		res.json(err);
+	})
+
 })
 
 app.get('/', (req, res)=>{

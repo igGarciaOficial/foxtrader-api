@@ -4,6 +4,17 @@ const { doLogin } = require('../controller/userController');
 
 module.exports = {
 
+    async authenticateUser(email, password){
+        let sql = "SELECT colPassword FROM tblAuth WHERE colEmail = $1;";
+
+        const result = await pool.query(sql, [email]);
+
+        if(result.rows[0].colpassword == crypto.cryptoPassword(password)){
+            return true;
+        }
+        return false;
+    },
+
     // OK
     async createUser(dataUser, linkCreated){
         let [name, email, senha, indicator] = dataUser;
@@ -43,9 +54,9 @@ module.exports = {
     getUser(userIdOrEmail){
         let sql = '';
         if (userIdOrEmail.includes('@')){
-            sql = "SELECT coluserid as id, colname as name, coltype as level FROM tblUser WHERE colEmail = $1::varchar;";
+            sql = "SELECT coluserid as id, colname as name, colType as level FROM tblUser WHERE colEmail = $1::varchar;";
         }else{
-            sql = "SELECT coluserid as id, colname as name, coltype as level FROM tblUser WHERE colUserID = $1::bigint;"
+            sql = "SELECT coluserid as id, colname as name, colType as level FROM tblUser WHERE colUserID = $1::bigint;"
         }
 
         return new Promise( (res, rej) => {
@@ -76,26 +87,6 @@ module.exports = {
                 res(r.rows);
             })
         })
-    },
-
-
-    //OK
-    updateUserName(userID, newName){
-
-        let sql = "UPDATE tblUser SET colName = $1 WHERE colUserID = $2;"
-
-        return new Promise( (res, rej) => {
-            pool.query( sql, [newName, userID], (err, result) => {
-                if (err)
-                    rej(err);
-
-                if (result.rowCount === 0 ){
-                    rej({status:'Error', message:'User not found'});
-                }
-
-                res({status:'OK', message: 'Name updated with success'})
-            });
-        });
     },
 
     //OK
@@ -158,6 +149,17 @@ module.exports = {
         return result.rows;
     },
 
+    getTypeUser(email){
+        let sql = 'SELECT colType as type FROM tblUser WHERE colEmail = $1;';
+        return new Promise( (res, rej) => {
+            pool.query(sql, [email], (err, result)=>{
+                if(err)
+                    res(1);
+                res(result.rows)
+            })
+        })
+    },
+
     //OK
     updateBallanceUser(userID, newBalance){
         let sql = 'UPDATE tblUser SET colWallet = $1 WHERE colUserID = $2;';
@@ -173,6 +175,25 @@ module.exports = {
                 res({status:'OK', message: 'Wallet updated with success'});
             })
         })
+    },
+
+    //OK
+    updateUserName(userID, newName){
+
+        let sql = "UPDATE tblUser SET colName = $1 WHERE colUserID = $2;"
+
+        return new Promise( (res, rej) => {
+            pool.query( sql, [newName, userID], (err, result) => {
+                if (err)
+                    rej(err);
+
+                if (result.rowCount === 0 ){
+                    rej({status:'Error', message:'User not found'});
+                }
+
+                res({status:'OK', message: 'Name updated with success'})
+            });
+        });
     },
 
     //OK
@@ -192,26 +213,17 @@ module.exports = {
         })
     },
 
-    async authenticateUser(email, password){
-        let sql = "SELECT colPassword FROM tblAuth WHERE colEmail = $1;";
-
-        const result = await pool.query(sql, [email]);
-
-        if(result.rows[0].colpassword == crypto.cryptoPassword(password)){
-            return true;
-        }
-        return false;
-    },
-
     updatePassword(email, newPassword){
-        let sql = 'UPDATE tblUser SET colPassword = $1 WHERE colEmail = $2;';
+        newPassword = crypto.cryptoPassword(newPassword);
+        
+        let sql = 'UPDATE tblAuth SET colPassword = $1 WHERE colEmail = $2;';
         return new Promise( (res, rej)=>{
             pool.query(sql, [newPassword, email], (err, r)=>{
                 if(err)
                     rej(err);
                 else if(r.rowCount===0)
                     rej({status:'ERROR', code:500, message:'Error to update the password'});
-                res(r.rows)
+                res({status:'OK', message: 'Senha atualizada com sucesso'})
             })
         })
     }

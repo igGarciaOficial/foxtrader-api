@@ -3,7 +3,7 @@ const crypto = require('./crypto.js');
 module.exports = {
     makeToken(email){
         let timeNow = new Date();
-        timeNow.setMinutes(timeNow.getMinutes(), 900);
+        timeNow.setMinutes(timeNow.getMinutes(), 1200); //Tokens de 20 min
         let expirationTime = timeNow.getTime();
         let token = email + '|' + expirationTime;
         token = crypto.cryptoToMakenToken(token);

@@ -7,57 +7,6 @@ const validators = require('../utils/validators.js');
 
 class ProductController extends GeneralController {
 
-    static createProduct(dataProduct, token){
-
-        if (!validators.isAuthenticated(token)){
-            return super.defaultAnswerToSetMethod(undefined, 'User not authenticated');
-        }
-
-        if (!validators.checkLevelPermissionUser()){
-            return super.defaultAnswerToSetMethod(undefined, 'User unauthorized');
-        }
-
-        let name = dataProduct.name;
-        let description = dataProduct.description;
-        let price = dataProduct.price;
-        let category = dataProduct.category;
-
-        //const result =  await productDAO.createProduct(name, description, price, category); 
-        return productDAO.createProduct(name, description, price, category);
-        //return  super.defaultAnswerToSetMethod(result)
-    }
-
-    static getProducts(category){
-        /* Comentado por conta da landpage */
-        // if(!validators.isAuthenticated(token)){
-        //     return super.defaultAnswerToSetMethod(undefined, 'User not authenticated');
-        // }
-
-        //const result = await productDAO.readProducts(category);
-        return productDAO.readProducts(category)
-    }
-
-    static updateProduct(productData, token){
-        if(!validators.isAuthenticated(token)){
-            return this.defaultAnswerToSetMethod(undefined, 'User not authenticated')
-        }
-        else if(!validators.checkLevelPermissionUser(token)){
-            return this.defaultAnswerToSetMethod(undefined, 'Operation denied')
-        }
-
-        return productDAO.updateProduct(productData);
-    }
-
-    static deleteProduct(idProduct, token){
-        if(!validators.isAuthenticated(token)){
-            return this.defaultAnswerToSetMethod(undefined, 'User not authenticated')
-        }else if(!validators.checkLevelPermissionUser(token)){
-            return this.defaultAnswerToSetMethod(undefined, 'Operation denied')
-        }
-        return productDAO.deleteProduct(idProduct);
-    }
-
-
     static async buyProduct(idProduct, price, idUser=null, indication=null){
 
         /**
@@ -141,6 +90,56 @@ class ProductController extends GeneralController {
                 rej(resultado)
             })
         }
+    }
+
+    static async createProduct(dataProduct, token){
+
+        if (!validators.isAuthenticated(token)){
+            return super.defaultAnswerToSetMethod(undefined, 'User not authenticated');
+        }
+
+        else if (! await validators.checkLevelPermissionUser(token.email, 'product')){
+            return super.defaultAnswerToSetMethod(undefined, 'User unauthorized');
+        }
+
+        let name = dataProduct.name;
+        let description = dataProduct.description;
+        let price = dataProduct.price;
+        let category = dataProduct.category;
+
+        //const result =  await productDAO.createProduct(name, description, price, category); 
+        return productDAO.createProduct(name, description, price, category);
+        //return  super.defaultAnswerToSetMethod(result)
+    }
+
+    static getProducts(category){
+        /* Comentado por conta da landpage */
+        // if(!validators.isAuthenticated(token)){
+        //     return super.defaultAnswerToSetMethod(undefined, 'User not authenticated');
+        // }
+
+        //const result = await productDAO.readProducts(category);
+        return productDAO.readProducts(category)
+    }
+
+    static deleteProduct(idProduct, token){
+        if(!validators.isAuthenticated(token)){
+            return this.defaultAnswerToSetMethod(undefined, 'User not authenticated')
+        }else if(!validators.checkLevelPermissionUser(token.email, 'product')){
+            return this.defaultAnswerToSetMethod(undefined, 'Operation denied')
+        }
+        return productDAO.deleteProduct(idProduct);
+    }
+
+    static async updateProduct(productData, token){
+        if(!validators.isAuthenticated(token)){
+            return this.defaultAnswerToSetMethod(undefined, 'User not authenticated')
+        }
+        else if(! await validators.checkLevelPermissionUser(token.email, 'product')){
+            return this.defaultAnswerToSetMethod(undefined, 'Operation denied')
+        }
+
+        return productDAO.updateProduct(productData);
     }
 
 }

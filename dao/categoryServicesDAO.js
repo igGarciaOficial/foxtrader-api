@@ -27,8 +27,10 @@ module.exports = {
                 else if (result.rowCount === 0)
                     rej({status:'Error', message: 'Error to get categories'});
                 
-                res(result.rows);
-                
+                if(result.rows != undefined)
+                    res(result.rows);
+                else
+                    res([])
             })
         })
     },
@@ -42,7 +44,7 @@ module.exports = {
                     rej(err)
 
                 else if (result.rowCount === 0 )
-                    rej(new Error(`Error to update the category ${name}`));
+                    rej({status: 'ERROR', message:`Error to update the category ${name}`});
                 res({status:'OK', code:200, message:'Categoria atualizada com sucesso'});
         })
       })

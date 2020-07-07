@@ -6,7 +6,7 @@ class GeneralController{
         obj = ( obj[0] == undefined )?obj:obj[0];
 
         return new Promise( (res, rej) => {
-            obj.affectedRows != 0 ?res( {status: 'OK'} ):rej(new Error(messageParamCaseError));
+            obj.affectedRows != 0 ?res( {status: 'OK'} ):rej({status: 'ERROR', message:messageParamCaseError});
         })
 
     }

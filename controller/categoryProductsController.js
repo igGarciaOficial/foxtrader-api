@@ -6,12 +6,12 @@ const validators = require('../utils/validators.js');
 class CategoryProductController extends GeneralController{
 
 
-    static createCategory(name, description, token){
+    static async createCategory(name, description, token){
         if (!validators.isAuthenticated(token)){
             return super.defaultAnswerToSetMethod(undefined, 'User not authenticated');
         }
 
-        else if(!validators.checkLevelPermissionUser(token.email)){
+        else if(! await validators.checkLevelPermissionUser(token.email, 'category')){
             return super.defaultAnswerToSetMethod(undefined, 'User unautorized');
         }
         return categoryProductDAO.createCategory(name, description);
@@ -21,11 +21,12 @@ class CategoryProductController extends GeneralController{
         return categoryProductDAO.getCategories();
     }
 
-    static updateCategory(id, name, description, token){
+    static async updateCategory(id, name, description, token){
         if (!validators.isAuthenticated(token)){
             return super.defaultAnswerToSetMethod(undefined, 'User not authenticated');
         }
-        else if(!validators.checkLevelPermissionUser(token.email)){
+        
+        else if(! await validators.checkLevelPermissionUser(token.email, 'category')){
             return super.defaultAnswerToSetMethod(undefined, 'User unautorized');
         }
         return categoryProductDAO.updateCategory(id, name, description);
