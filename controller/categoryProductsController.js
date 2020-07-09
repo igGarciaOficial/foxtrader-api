@@ -12,9 +12,20 @@ class CategoryProductController extends GeneralController{
         }
 
         else if(! await validators.checkLevelPermissionUser(token.email, 'category')){
-            return super.defaultAnswerToSetMethod(undefined, 'User unautorized');
+            return super.defaultAnswerToSetMethod(undefined, 'User unautorized.');
         }
         return categoryProductDAO.createCategory(name, description);
+    }
+
+    static async deleteCategory(id, token){
+        
+        if(! validators.isAuthenticated(token)){
+            return this.defaultAnswerToSetMethod(undefined, 'User not authenticated. Please do the login again.')
+        }else if(! await validators.checkLevelPermissionUser(token.email, 'category')){
+            return this.defaultAnswerToSetMethod(undefined, 'User not authorized.')
+        }
+
+        return categoryProductDAO.deleteCategory(id);
     }
 
     static readCategories(){

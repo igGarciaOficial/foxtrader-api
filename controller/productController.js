@@ -122,10 +122,10 @@ class ProductController extends GeneralController {
         return productDAO.readProducts(category)
     }
 
-    static deleteProduct(idProduct, token){
+    static async deleteProduct(idProduct, token){
         if(!validators.isAuthenticated(token)){
             return this.defaultAnswerToSetMethod(undefined, 'User not authenticated')
-        }else if(!validators.checkLevelPermissionUser(token.email, 'product')){
+        }else if(! await validators.checkLevelPermissionUser(token.email, 'product')){
             return this.defaultAnswerToSetMethod(undefined, 'Operation denied')
         }
         return productDAO.deleteProduct(idProduct);

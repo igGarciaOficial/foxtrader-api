@@ -17,6 +17,20 @@ module.exports = {
         });
     },
 
+    deleteCategory(id){
+        let sql = 'DELETE FROM tblCategoryProducts WHERE colIdCategory = $1;';
+
+        return new Promise((res, rej) => {
+            pool.query(sql, [id], (err, result) => {
+                if(err)
+                    rej(err)
+                res({status: 'OK', message:'Catoria deletada com sucesso'})
+            })
+        })
+
+        
+    },
+
     getCategories(){
         let sql = 'SELECT colidCategory as id, colname as name, coldescription as description FROM tblCategoryProducts ORDER BY colName;';
 

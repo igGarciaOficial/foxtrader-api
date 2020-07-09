@@ -204,6 +204,20 @@ app.put('/shopping/category', (req, res)=>{
 	})
 })
 
+app.delete('/shopping/category', (req, res) => {
+	let id = req.body.id;
+
+	let token = tratarTokenRecebido(req.headers);
+	CATEGORY_PRODUCT.deleteCategory(id, token)
+	.then(result => {
+		res.status(200).send(result);
+	}).catch(err => {
+		if(err.code == '23503')
+			res.json({status: 'ERROR', message:'A categoria especificada tem produtos linkados, remova todos os produtos antes de excluir a categoria.'})
+		res.json(err);
+	})
+})
+
 /* ROUTES TO PRODUCT */
 
 app.get('/shopping/category/products/:id', (req, res)=>{
@@ -247,7 +261,7 @@ app.post('/shopping/product/new', (req, res) => {
 	})
 })
 
-app.put('/shopping/product/', (req, res) => {
+app.put('/shopping/product', (req, res) => {
 	/*
 	* ROTA PARA ATUALIZAÇÃO DE DADOS DE UM PRODUTO
 	*/
@@ -268,6 +282,17 @@ app.put('/shopping/product/', (req, res) => {
 	})
 })
 
+app.delete('/shopping/product', (req, res)=>{
+	let id = req.body.id;
+	let token = tratarTokenRecebido(req.headers);
+
+	PRODUCTS_CONTROLLER.deleteProduct(id, token)
+	.then(result => {
+		res.status(200).send(result);
+	}).catch(err => {
+		res.json(err);
+	})
+})
 
 /*
 * ROUTES TO SUPORT
@@ -296,9 +321,11 @@ app.post('/suport/email', (req, res) => {
 app.post('/checkToken', (req, res) => {
 	let token = tratarTokenRecebido(req.headers);
 
-	if( isAuthenticated(token) )
-		res.status(200).json({ status:'OK' })
-	res.status(200).json({ status: 'ERROR' })
+	if( isAuthenticated(token) ){
+		res.status(200).json({ status:'OK' });
+	}else{
+		res.send({ status: 'ERROR' });		
+	}
 })
 
 /*

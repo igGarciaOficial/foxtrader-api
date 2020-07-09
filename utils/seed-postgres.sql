@@ -14,7 +14,7 @@ create table if not exists tblTypeUser(
 );
 
 create table if not exists tblAuth (
-    colCreated TIMESTAMPTZ DEFAULT current_timestamp,
+    /*colCreated TIMESTAMPTZ DEFAULT current_timestamp,*/
     /*colUpdated TIMESTAMPTZ UPDATE ON current_timestamp,*/
 	colEmail varchar(200) not NULL unique,
 	colPassword varchar(255) not null,
