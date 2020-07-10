@@ -26,11 +26,11 @@ const corsOptions = {
 	}
 }
 
-app.options('*', cors(corsOptions))
+//app.options('*', cors(corsOptions))
 
 /* Routes to user */
 //OK
-app.post('/user/register', (req, res) => {
+app.post('/user/register', cors(corsOptions), (req, res) => {
 	// OK ROUTE
 
 	let obj = {
@@ -50,7 +50,7 @@ app.post('/user/register', (req, res) => {
 	});
 });
 
-app.post('/login', (req, response) => {
+app.post('/login', cors(corsOptions), (req, response) => {
 	/**
 	 * Realizar login na plataforma
 	 */
@@ -64,7 +64,7 @@ app.post('/login', (req, response) => {
 	})
 })
 
-app.put('/user/updateName', (req, res) => {
+app.put('/user/updateName', cors(corsOptions), (req, res) => {
 	// ROUTE DEFINED
 	/**
 	 * Atualizar nome de um usuario especifico
@@ -82,7 +82,7 @@ app.put('/user/updateName', (req, res) => {
 
 });
 
-app.put('/user/updatepassword', (req, res)=>{
+app.put('/user/updatepassword', cors(corsOptions), (req, res)=>{
 	/*
 	* Rota para atualizar senha de usuario
 	*/
@@ -100,7 +100,7 @@ app.put('/user/updatepassword', (req, res)=>{
 	})
 })
 
-app.get('/user/affiliate/:linkID', (req, res) => {
+app.get('/user/affiliate/:linkID', cors(corsOptions), (req, res) => {
 	/**
 	 * Pegar quantias de afiliados do usuario em todos os níveis;
 	 */
@@ -115,7 +115,7 @@ app.get('/user/affiliate/:linkID', (req, res) => {
 		});
 });
 
-app.get('/user/:id', (req, res)=>{
+app.get('/user/:id', cors(corsOptions), (req, res)=>{
 	// OK;
 	/**
 	 * Pegar informações base do usuario: Nome, email e id;
@@ -130,7 +130,7 @@ app.get('/user/:id', (req, res)=>{
 
 });
 
-app.get('/user/link/:id', (req, res)=>{
+app.get('/user/link/:id', cors(corsOptions), (req, res)=>{
 	/**
 	 * Pegar link de afiliacao de um usuario especifico
 	 */
@@ -148,7 +148,7 @@ app.get('/user/link/:id', (req, res)=>{
 
 /* Routes to wallet */
 
-app.get('/user/wallet/:id', (req, res)=>{
+app.get('/user/wallet/:id', cors(corsOptions), (req, res)=>{
 	/**
 	 * Pegar saldo da carteira de um usuário especifico.
 	 */
@@ -165,7 +165,7 @@ app.get('/user/wallet/:id', (req, res)=>{
 });
 
 /* ROUTES TO SHOPPING */
-app.get('/shopping/all', (req, res) => {
+app.get('/shopping/all', cors(corsOptions), (req, res) => {
 	BUSSINESS_CONTROLLER.getAllShopping()
 	.then(suc => {
 		res.status(200).send(suc);
@@ -174,7 +174,7 @@ app.get('/shopping/all', (req, res) => {
 	})
 })
 
-app.get('/shopping/categories', (req, res)=>{
+app.get('/shopping/categories', cors(corsOptions), (req, res)=>{
 	/**
 	 * Pegar categorias existentes
 	 */
@@ -186,7 +186,7 @@ app.get('/shopping/categories', (req, res)=>{
 	})
 })
 
-app.post('/shopping/category', (req, res) => {
+app.post('/shopping/category', cors(corsOptions), (req, res) => {
 	/**
 	 * Criar nova categoria
 	 */
@@ -203,7 +203,7 @@ app.post('/shopping/category', (req, res) => {
 	})
 });
 
-app.put('/shopping/category', (req, res)=>{
+app.put('/shopping/category', cors(corsOptions), (req, res)=>{
 	let token = tratarTokenRecebido(req.headers);
 	let id = req.body.id;
 	let name = req.body.name;
@@ -217,7 +217,7 @@ app.put('/shopping/category', (req, res)=>{
 	})
 })
 
-app.delete('/shopping/category', (req, res) => {
+app.delete('/shopping/category', cors(corsOptions), (req, res) => {
 	let id = req.body.id;
 
 	let token = tratarTokenRecebido(req.headers);
@@ -233,7 +233,7 @@ app.delete('/shopping/category', (req, res) => {
 
 /* ROUTES TO PRODUCT */
 
-app.get('/shopping/category/products/:id', (req, res)=>{
+app.get('/shopping/category/products/:id', cors(corsOptions), (req, res)=>{
 	/**
 	 *  Pegar todos os produtos de uma categoria específica.
 	 */
@@ -247,7 +247,7 @@ app.get('/shopping/category/products/:id', (req, res)=>{
 	})
 })
 
-app.post('/shopping/product/new', (req, res) => {
+app.post('/shopping/product/new', cors(corsOptions), (req, res) => {
 	/*
 	* Rota para criar um novo produto
 	*/
@@ -274,7 +274,7 @@ app.post('/shopping/product/new', (req, res) => {
 	})
 })
 
-app.put('/shopping/product', (req, res) => {
+app.put('/shopping/product', cors(corsOptions), (req, res) => {
 	/*
 	* ROTA PARA ATUALIZAÇÃO DE DADOS DE UM PRODUTO
 	*/
@@ -295,7 +295,7 @@ app.put('/shopping/product', (req, res) => {
 	})
 })
 
-app.delete('/shopping/product', (req, res)=>{
+app.delete('/shopping/product', cors(corsOptions), (req, res)=>{
 	let id = req.body.id;
 	let token = tratarTokenRecebido(req.headers);
 
@@ -331,7 +331,7 @@ app.post('/suport/email', (req, res) => {
  * Route to test token;
 */
 
-app.post('/checkToken', (req, res) => {
+app.post('/checkToken', cors(corsOptions), (req, res) => {
 	let token = tratarTokenRecebido(req.headers);
 
 	if( isAuthenticated(token) ){
@@ -345,7 +345,7 @@ app.post('/checkToken', (req, res) => {
  * Routes to business
 */
 
-app.get('/business/telemetry', (req, res)=> {
+app.get('/business/telemetry', cors(corsOptions), (req, res)=> {
 	let token = tratarTokenRecebido(req.headers);
 	
 	BUSSINESS_CONTROLLER.getTelemetry(token)
