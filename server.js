@@ -14,25 +14,12 @@ const SUPORT_SERVICE = require('./services/suporte.js');
 const { tratarTokenRecebido } = require('./utils/token.js');
 const { isAuthenticated } = require('./utils/validators.js');
 
-//const permitedAddresses = ['https://fox-trader-plataform.netlify.app'];
+const corsOptions = {
+	origin: ['https://fox-trader-plataform.netlify.app']
+}
+app.use(cors(corsOptions));
 
-/*const corsOptions = {
-	origin: function(origin, callback){
-		if(permitedAddresses.indexOf(origin) !== -1){
-			callback(null, true);
-		}else{
-			callback(new Error('Not allowed by CORS'))
-		}
-	}
-}*/
 
-app.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', 'https://fox-trader-plataform.netlify.app');
-	app.use(cors());
-	next();
-})
-
-//app.options('*', cors(corsOptions))
 
 /* Routes to user */
 //OK

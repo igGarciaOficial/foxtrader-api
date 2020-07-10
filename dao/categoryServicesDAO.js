@@ -41,7 +41,8 @@ module.exports = {
                 else if (result.rowCount === 0)
                     rej({status:'Error', message: 'Error to get categories'});
                 
-                if(result.rows != undefined)
+                
+                if(result != undefined && result != 'undefined')
                     res(result.rows);
                 else
                     res([])
